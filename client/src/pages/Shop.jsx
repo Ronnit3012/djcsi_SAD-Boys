@@ -18,6 +18,7 @@ function Shop() {
   };
 
   return (
+    
     <div>
       <div className="flex bg-blue-500 text-white text-4xl text-center mb-4 px-12 py-12 ">
         Here, you can Visualize your Bedrooms, kitchen and Drawing rooms and
