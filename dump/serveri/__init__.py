@@ -8,11 +8,13 @@ load_dotenv()
 
 app = Flask(__name__)
 
-CORS(app, origins="*", supports_credentials=False)
+CORS(app, origins=["*"], supports_credentials=True)
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 app.register_blueprint(user_routes.users_bp, url_prefix='/api/v1/users')
 

@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from bson import json_util
 import json
 from database import database
@@ -15,23 +15,24 @@ users_bp = Blueprint(
 @users_bp.route('/signup', methods=["POST"])
 def signUpUser():
     try:
-        username = request.json["username"]
+        username = request.json["name"]
         password = request.json["password"]
         email = request.json["email"]
-
+        print(username)
         user = {
             'username': username,
             'password': password,
             'email': email
         }
 
-        user = mongoClient["users"].insert_one(user)
-
-        return {'message': json.loads(json_util.dumps(user)), 'status': 200}
+        res = mongoClient["users"].insert_one(user)
+        print(res.acknowledged)
+        return jsonify({'message': json.loads(json_util.dumps(user)), 'status': 200})
 
     except Exception as Argument:
         print(Argument)
         return Argument
+    # return "hi"
 
 
 @users_bp.route('', methods=["GET"])
@@ -46,23 +47,24 @@ def getUser():
         print(Argument)
         return Argument
 
+
 @users_bp.route('/login', methods=["POST"])
 def loginUser():
     try:
         username = request.json["username"]
         password = request.json["password"]
 
-
         user = mongoClient["users"].find_one({
             'username': username,
             'password': password,
-            })
+        })
 
         return {'user': json.loads(json_util.dumps(user)), 'message': 'sucess', 'status': 200}
 
     except Exception as Argument:
         print(Argument)
         return Argument
+
 
 @users_bp.route('/orignalImage', methods=["POST"])
 def addOrgImage():
