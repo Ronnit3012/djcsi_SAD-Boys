@@ -1,9 +1,5 @@
 import os
-from io import StringIO
 import tarfile
-import tempfile
-import urllib
-import cv2
 from matplotlib import gridspec
 from matplotlib import pyplot as plt
 import numpy as np
@@ -108,115 +104,34 @@ def label_to_color_image(label):
 
     return colormap[label]
 
-
-def vis_segmentation(image, seg_map):
-    """Visualizes input image, segmentation map and overlay view."""
-    plt.figure(figsize=(15, 5))
-    grid_spec = gridspec.GridSpec(1, 4, width_ratios=[6, 6, 6, 1])
-
-    plt.subplot(grid_spec[0])
-    plt.imshow(image)
-    plt.axis('off')
-    plt.title('input image')
-
-    plt.subplot(grid_spec[1])
-    seg_image = label_to_color_image(seg_map).astype(np.uint8)
-    plt.imshow(seg_image)
-    plt.axis('off')
-    plt.title('segmentation map')
-
-    plt.subplot(grid_spec[2])
-    plt.imshow(image)
-    plt.imshow(seg_image, alpha=0.7)
-    plt.axis('off')
-    plt.title('segmentation overlay')
-
-    unique_labels = np.unique(seg_map)
-    ax = plt.subplot(grid_spec[3])
-    plt.imshow(
-        FULL_COLOR_MAP[unique_labels].astype(np.uint8), interpolation='nearest')
-    ax.yaxis.tick_right()
-    plt.yticks(range(len(unique_labels)), LABEL_NAMES[unique_labels])
-    plt.xticks([], [])
-    ax.tick_params(width=0.0)
-    plt.grid('off')
-    plt.show()
-
-
 LABEL_NAMES = np.asarray([
     'wall', 'background', 'building, edifice', 'sky', 'floor, flooring', 'tree', 'ceiling', 'road, route', 'bed ', 'windowpane, window ', 'grass', 'cabinet', 'sidewalk, pavement', 'person, individual, someone, somebody, mortal, soul', 'earth, ground', 'door, double door', 'table', 'mountain, mount', 'plant, flora, plant life', 'curtain, drape, drapery, mantle, pall', 'chair', 'car, auto, automobile, machine, motorcar', 'water', 'painting, picture', 'sofa, couch, lounge', 'shelf', 'house', 'sea', 'mirror', 'rug, carpet, carpeting', 'field', 'armchair', 'seat', 'fence, fencing', 'desk', 'rock, stone', 'wardrobe, closet, press', 'lamp', 'bathtub, bathing tub, bath, tub', 'railing, rail', 'cushion', 'base, pedestal, stand', 'box', 'column, pillar', 'signboard, sign', 'chest of drawers, chest, bureau, dresser', 'counter', 'sand', 'sink', 'skyscraper', 'fireplace, hearth, open fireplace', 'refrigerator, icebox', 'grandstand, covered stand', 'path', 'stairs, steps', 'runway', 'case, display case, showcase, vitrine', 'pool table, billiard table, snooker table', 'pillow', 'screen door, screen', 'stairway, staircase', 'river', 'bridge, span', 'bookcase', 'blind, screen', 'coffee table, cocktail table', 'toilet, can, commode, crapper, pot, potty, stool, throne', 'flower', 'book', 'hill', 'bench', 'countertop', 'stove, kitchen stove, range, kitchen range, cooking stove', 'palm, palm tree', 'kitchen island', 'computer, computing machine, computing device, data processor, electronic computer, information processing system', 'swivel chair', 'boat', 'bar', 'arcade machine', 'hovel, hut, hutch, shack, shanty', 'bus, autobus, coach, charabanc, double-decker, jitney, motorbus, motorcoach, omnibus, passenger vehicle', 'towel', 'light, light source', 'truck, motortruck', 'tower', 'chandelier, pendant, pendent', 'awning, sunshade, sunblind', 'streetlight, street lamp', 'booth, cubicle, stall, kiosk', 'television receiver, television, television set, tv, tv set, idiot box, boob tube, telly, goggle box', 'airplane, aeroplane, plane', 'dirt track', 'apparel, wearing apparel, dress, clothes', 'pole', 'land, ground, soil', 'bannister, banister, balustrade, balusters, handrail', 'escalator, moving staircase, moving stairway', 'ottoman, pouf, pouffe, puff, hassock', 'bottle', 'buffet, counter, sideboard', 'poster, posting, placard, notice, bill, card', 'stage', 'van', 'ship', 'fountain', 'conveyer belt, conveyor belt, conveyer, conveyor, transporter', 'canopy', 'washer, automatic washer, washing machine', 'plaything, toy', 'swimming pool, swimming bath, natatorium', 'stool', 'barrel, cask', 'basket, handbasket', 'waterfall, falls', 'tent, collapsible shelter', 'bag', 'minibike, motorbike', 'cradle', 'oven', 'ball', 'food, solid food', 'step, stair', 'tank, storage tank', 'trade name, brand name, brand, marque', 'microwave, microwave oven', 'pot, flowerpot', 'animal, animate being, beast, brute, creature, fauna', 'bicycle, bike, wheel, cycle ', 'lake', 'dishwasher, dish washer, dishwashing machine', 'screen, silver screen, projection screen', 'blanket, cover', 'sculpture', 'hood, exhaust hood', 'sconce', 'vase', 'traffic light, traffic signal, stoplight', 'tray', 'ashcan, trash can, garbage can, wastebin, ash bin, ash-bin, ashbin, dustbin, trash barrel, trash bin', 'fan', 'pier, wharf, wharfage, dock', 'crt screen', 'plate', 'monitor, monitoring device', 'bulletin board, notice board', 'shower', 'radiator', 'glass, drinking glass', 'clock', 'flag'
 ])
 
-FULL_LABEL_MAP = np.arange(len(LABEL_NAMES)).reshape(len(LABEL_NAMES), 1)
-FULL_COLOR_MAP = label_to_color_image(FULL_LABEL_MAP)
-
-MODEL_NAME = 'deeplabv3_xception_ade20k_train'
-_DOWNLOAD_URL_PREFIX = 'http://download.tensorflow.org/models/'
-_MODEL_URLS = {
-    'deeplabv3_xception_ade20k_train': 'deeplabv3_xception_ade20k_train_2018_05_29.tar.gz',
-}
-_TARBALL_NAME = 'deeplab_model.tar.gz'
-
-model_dir = tempfile.mkdtemp()
-tf.compat.v1.gfile.MakeDirs(model_dir)
-
-download_path = os.path.join(model_dir, _TARBALL_NAME)
-print('downloading model, this might take a while...')
-urllib.request.urlretrieve(_DOWNLOAD_URL_PREFIX + _MODEL_URLS[MODEL_NAME],
-                           download_path)
-print('download completed! loading DeepLab model...')
-
-MODEL = DeepLabModel(download_path)
-
+MODEL = DeepLabModel('./deeplabv3_xception_ade20k_train_2018_05_29.tar.gz')
 print('model loaded successfully!')
 
-MODEL.save('./checkpoints/my_checkpoint')
+def colorImage(file_name, color):
 
-print('Model saved')
+    orignal_im = Image.open(file_name)
 
-file_name = './im_(149).jpg'
+    print('running deeplab on image %s...' % file_name)
+    resized_im, seg_map = MODEL.run(orignal_im)
 
-# for name, data in uploaded.items():
-#     with open(file_name, 'wb') as f:
-#         f.write(data)
-#         f.close()
-#         print('saved file ' + name)
+    w, h = resized_im.size
+    print(w, h)
 
-orignal_im = Image.open(file_name)
+    for i in range(h):
+        for j in range(w):
+            if seg_map[i][j] == 1:
+                seg_map[i][j] = 1
+            else:
+                seg_map[i][j] = 0
 
-print('running deeplab on image %s...' % file_name)
-resized_im, seg_map = MODEL.run(orignal_im)
-# vis_segmentation(resized_im, seg_map)
+    mask_j=np.repeat(seg_map[...,None],3,axis=2)
 
-w, h = resized_im.size
-print(w, h)
+    mask_j[np.where((mask_j==[1,1,1]).any(axis=2))] =  color   # RGB values for Blue color
 
-for i in range(h):
-    for j in range(w):
-        if seg_map[i][j] == 1:
-            seg_map[i][j] = 1
-        else:
-            seg_map[i][j] = 0
+    output_image=mask_j+resized_im
 
-mask_j=np.repeat(seg_map[...,None],3,axis=2)
-
-mask_j[np.where((mask_j==[1,1,1]).any(axis=2))] = [255,0,0]    # RGB values for Blue color
-
-output_image=mask_j+resized_im
-
-plt.figure(figsize=(15, 5))
-grid_spec = gridspec.GridSpec(1, 4, width_ratios=[6, 6, 6, 1])
-
-plt.subplot(grid_spec[0])
-plt.imshow(resized_im)
-plt.axis('off')
-plt.title('input image')
-
-plt.subplot(grid_spec[1])
-seg_image = label_to_color_image(seg_map).astype(np.uint8)
-
-plt.imshow(output_image)
-
-plt.axis('off')
-plt.title('coloured image')
-plt.show()
+    return output_image

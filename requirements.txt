@@ -12,3 +12,8 @@ opencv-python
 tensorflow
 torch
 torchvision
+autopep8
+Flask
+Flask-Cors
+python-dotenv
+pymongo
