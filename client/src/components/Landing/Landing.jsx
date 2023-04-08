@@ -1,11 +1,12 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import paint1 from "../../assests/paint1.png";
 import paint2 from "../../assests/paint2.png";
 import paint3 from "../../assests/paint3.png";
 import "./Landing.css";
 
 const Landing = () => {
+  const navigate = useNavigate();
   var slideIndex = 1;
   var myTimer;
   var slideshowContainer;
@@ -18,7 +19,6 @@ const Landing = () => {
     } else {
       showSlides((slideIndex += 1));
     }
-
     //COMMENT OUT THE LINES BELOW TO KEEP ARROWS PART OF MOUSEENTER PAUSE/RESUME
     if (n === -1) {
       myTimer = setInterval(function () {
@@ -34,16 +34,21 @@ const Landing = () => {
   function showSlides(n) {
     var i;
     var slides = document.getElementsByClassName("mySlides");
-    if (n > slides.length) {
-      slideIndex = 1;
+    if (Array.from(slides).length !== 0) {
+      if (n > slides.length) {
+        slideIndex = 1;
+      }
+      if (n < 1) {
+        slideIndex = slides.length;
+      }
+      for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+      }
+      // console.log(slides);
+      slides[slideIndex - 1].style.display = "block";
+    } else {
+      pause();
     }
-    if (n < 1) {
-      slideIndex = slides.length;
-    }
-    for (i = 0; i < slides.length; i++) {
-      slides[i].style.display = "none";
-    }
-    slides[slideIndex - 1].style.display = "block";
   }
 
   const pause = () => {
@@ -85,13 +90,12 @@ const Landing = () => {
             Visualize Home Decor
           </h1>
           <p className="mb-6 max-w-2xl font-semibold text-slate-700 lg:mb-8 md:text-lg lg:text-xl dark:text-slate-800">
-            Easily detect fake profiles from display pictures using Computer
-            Vision and Deep Learning models deployed for inference via simple
-            API calls. Harness the power of machine learning while staying out
-            of MLOps!
+            An easy webapp for visualizing the colors and textures fo your walls
+            from the comfort of your Home. Harness the power of machine learning
+            while staying out of MLOps!
           </p>
-          <Link
-            to="/shop"
+          <button
+            onClick={() => {pause(); navigate("/shop");}}
             id="get-started-mid"
             className="cursor-pointer inline-flex font-bold justify-center items-center py-3 px-5 mr-3 text-base text-center text-slate-50 rounded-lg bg-slate-900 ease-in-out delay-100 hover:bg-black focus:ring-4 focus:ring-slate-300 dark:focus:ring-slate-900"
           >
@@ -108,7 +112,7 @@ const Landing = () => {
                 clipRule="evenodd"
               ></path>
             </svg>
-          </Link>
+          </button>
         </div>
         <div className="hidden lg:mt-0 lg:col-span-5 lg:flex">
           <div className="slideshow-container">
