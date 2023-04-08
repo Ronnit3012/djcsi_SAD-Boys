@@ -1,11 +1,11 @@
 from flask import Blueprint, request
 from bson import json_util
 import json
-from db import db
+from database import database
 import uuid
 from werkzeug import secure_filename
 
-mongoClient = db.get_database()
+mongoClient = database.get_database()
 
 users_bp = Blueprint(
     'users_bp', __name__,

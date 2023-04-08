@@ -16,3 +16,4 @@ autopep8
 Flask
 Flask-Cors
 python-dotenv
+bson
