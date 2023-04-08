@@ -3,7 +3,7 @@ from bson import json_util
 import json
 from database import database
 import uuid
-from werkzeug import secure_filename
+from datetime import datetime
 
 mongoClient = database.get_database()
 
@@ -64,16 +64,25 @@ def loginUser():
         print(Argument)
         return Argument
 
-'''
-NOT COMPLETE
-'''
 @users_bp.route('/orignalImage', methods=["POST"])
 def addOrgImage():
     try:
         f = request.files['file']
         username = request.json["username"]
         fileName = uuid.uuid1()
-        
+        now = datetime.now()
+        f.save(fileName)
+
+        image = {
+            'time': now,
+            'name': fileName,
+            'username': username
+        }
+
+        image = mongoClient["org_images"].insert_one(image)
+
+        return {'message': json.loads(json_util.dumps(image)), 'status': 200}
+
     except Exception as Argument:
         print(Argument)
         return Argument

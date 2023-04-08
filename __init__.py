@@ -14,8 +14,6 @@ CORS(app, origins="*", supports_credentials=False)
 def index():
     return render_template('index.html')
 
-
-app.register_blueprint(user_routes.analysis_bp, url_prefix='/api/v1/users')
-
+app.register_blueprint(user_routes.users_bp, url_prefix='/api/v1/users')
 
 app.run(port=os.environ["PORT"], debug=True)
