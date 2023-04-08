@@ -2,3 +2,4 @@
 __pycache__
 clone
 *.pth
+deeplabv3_xception_ade20k_train
