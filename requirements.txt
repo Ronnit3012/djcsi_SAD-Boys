@@ -1,0 +1,14 @@
+# essential libraries
+ipykernel
+
+# scientific libraries
+numpy
+scipy
+matplotlib
+SciencePlots
+sympy
+pandas
+opencv-python
+tensorflow
+torch
+torchvision
