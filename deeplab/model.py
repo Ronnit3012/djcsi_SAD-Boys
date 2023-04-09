@@ -130,7 +130,7 @@ def hex_to_rgb(hex):
 def colorImage(file_name, color):
 
     try:
-        filepath = os.path.abspath('./assets/orignal_images/'+file_name)
+        filepath = os.path.abspath('./assets/original_images/'+file_name)
 
         print(f'Orignal Image: {filepath}')
 
