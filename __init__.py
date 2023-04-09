@@ -5,9 +5,11 @@ import deeplab.model as model
 
 app = Flask(__name__)
 
-CORS(app, origins="*", supports_credentials=False)
+CORS(app, origins=["*", "http://127.0.0.1:5000/generate_color"],
+     supports_credentials=False)
 
-@app.route('/generate_color',methods = ['POST'])
+
+@app.route('/generate_color', methods=['POST'])
 def generate_color():
     try:
         color = request.json["color"]
@@ -20,5 +22,6 @@ def generate_color():
     except Exception as e:
         print(e)
         return "fail"
+
 
 app.run(port=5000, debug=True)

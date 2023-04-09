@@ -10,9 +10,10 @@ import multer from 'multer';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import authRoutes from './routes/auth.js';
+import wallRoutes from './routes/wall.js';
 // import userRoutes from './routes/users.js';
-// import postRoutes from './routes/posts.js';
-// import { verifyToken } from './middlewares/verifyToken.js';
+import { identifyWalls } from './controllers/wall.js';
+import { verifyToken } from './middlewares/verifyToken.js';
 // import { register } from './controllers/auth.js';
 // import { createPost } from './controllers/posts.js';
 
@@ -34,7 +35,7 @@ app.use("/assets", express.static(path.join(__dirname, 'public/assets')));
 /* FILE STORAGE */
 const storage = multer.diskStorage({        // Multer GitHub repo
   destination: function(req, file, cb) {
-    cb(null, "public/assets");
+    cb(null, "../assets/original_images");
   },
   filename: function(req, file, cb) {
     cb(null, file.originalname);
@@ -42,13 +43,13 @@ const storage = multer.diskStorage({        // Multer GitHub repo
 });         // this is how you can save files anytime someone uploads a file on the website then the server will save the file at the destination('public/assets') mentioned with the filename
 const upload = multer({ storage });
 
+/* ROUTES WITH FILES */
+app.post('/wall/identify', upload.single('picture'), identifyWalls);
+
 /* ROUTES */
 app.use('/auth', authRoutes);
+app.use('/wall', wallRoutes);
 // app.use('/users', userRoutes);
-// app.use('/posts', postRoutes);
-
-/* ROUTES WITH FILES */
-// app.post('/post/create', createPost);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 3001;
