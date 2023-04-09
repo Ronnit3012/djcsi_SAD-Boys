@@ -1,5 +1,7 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { ErrorModal } from "../components";
 import paint1 from "../../assests/paint1.png";
 import paint2 from "../../assests/paint2.png";
 import paint3 from "../../assests/paint3.png";
@@ -7,6 +9,8 @@ import "./Landing.css";
 
 const Landing = () => {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
+  const [showModal, setShowModal] = useState(false);
   var slideIndex = 1;
   var myTimer;
   var slideshowContainer;
@@ -44,7 +48,7 @@ const Landing = () => {
       for (i = 0; i < slides.length; i++) {
         slides[i].style.display = "none";
       }
-      // console.log(slides);
+
       slides[slideIndex - 1].style.display = "block";
     } else {
       pause();
@@ -78,12 +82,23 @@ const Landing = () => {
     slideshowContainer.addEventListener("mouseleave", resume);
   };
 
+  const handleClick = () => {
+    if (user) {
+      pause();
+      navigate("/shop");
+    } else {
+      setShowModal(true);
+    }
+  };
+
   return (
     <section
       id="landing"
       onLoad={load}
       className="bg-white mt-5 dark:bg-blue-500"
     >
+      {/* Error Modal */}
+      {showModal && <ErrorModal setShowModal={setShowModal} pause={pause} />}
       <div className="grid items-center pt-6 px-4 mx-auto max-w-screen-xl lg:gap-8 xl:gap-0 lg:pt-12 lg:grid-cols-12">
         <div className="place-self-center mr-auto lg:col-span-7">
           <h1 className="mb-4 max-w-2xl text-4xl font-extrabold leading-none md:text-5xl xl:text-6xl dark:text-white">
@@ -95,7 +110,7 @@ const Landing = () => {
             while staying out of MLOps!
           </p>
           <button
-            onClick={() => {pause(); navigate("/shop");}}
+            onClick={handleClick}
             id="get-started-mid"
             className="cursor-pointer inline-flex font-bold justify-center items-center py-3 px-5 mr-3 text-base text-center text-slate-50 rounded-lg bg-slate-900 ease-in-out delay-100 hover:bg-black focus:ring-4 focus:ring-slate-300 dark:focus:ring-slate-900"
           >
