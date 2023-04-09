@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Footer, Header, Navbar } from "../components";
+import processing from "../../assests/processing.mp4";
 
 const Analysis = ({ paint }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [location, setLocation] = useState("");
+  const [isProcessing, setProcessing] = useState(false);
 
   const handleFileInput = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -14,6 +16,7 @@ const Analysis = ({ paint }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setProcessing(true);
     const formData = new FormData(e.target);
     let formProps = Object.fromEntries(formData);
     formData.append("filename", formProps.picture.name);
@@ -25,6 +28,7 @@ const Analysis = ({ paint }) => {
         formData
       );
       console.log(response.data);
+      setProcessing(false);
       setLocation(response.data.message);
     } catch (error) {
       console.log(error.message);
@@ -92,6 +96,13 @@ const Analysis = ({ paint }) => {
                   </div>
                 )}
               </div>
+              {isProcessing && (
+                <div className="flex justify-center items-center">
+                  <video width="50px" height="50px">
+                    <source type="video/mp4" src={processing} />
+                  </video>
+                </div>
+              )}
               {!location && (
                 <div className="block text-center px-12 py-12">
                   <button
