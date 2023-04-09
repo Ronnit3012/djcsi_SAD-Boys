@@ -1,8 +1,7 @@
 import express from "express";
-// import { identifyWalls } from '../controllers/wall.js';
-
+import { getPaints } from "../controllers/paint.js";
 const router = express.Router();
 
-
+router.get('/all', getPaints);
 
 export default router;

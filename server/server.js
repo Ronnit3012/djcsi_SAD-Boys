@@ -10,9 +10,9 @@ import multer from 'multer';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import authRoutes from './routes/auth.js';
-import wallRoutes from './routes/wall.js';
+import paintRoutes from './routes/paint.js';
 // import userRoutes from './routes/users.js';
-import { identifyWalls } from './controllers/wall.js';
+import { paintWall } from './controllers/paint.js';
 import { verifyToken } from './middlewares/verifyToken.js';
 // import { register } from './controllers/auth.js';
 // import { createPost } from './controllers/posts.js';
@@ -44,11 +44,11 @@ const storage = multer.diskStorage({        // Multer GitHub repo
 const upload = multer({ storage });
 
 /* ROUTES WITH FILES */
-app.post('/wall/identify', upload.single('picture'), identifyWalls);
+app.post('/paint/wall', upload.single('picture'), paintWall);
 
 /* ROUTES */
 app.use('/auth', authRoutes);
-app.use('/wall', wallRoutes);
+app.use('/paint', paintRoutes);
 // app.use('/users', userRoutes);
 
 /* MONGOOSE SETUP */
