@@ -6,6 +6,7 @@ import fs from "fs";
 const paintWall = async (req, res) => {
     try {
         const { filename, color="#FFFF00" } = req.body;
+        console.log(req.body)
         
         const response = await axios.post("http://127.0.0.1:5000/generate_color", { filename, color });
         console.log(response.data)
