@@ -4,8 +4,12 @@ import logo from "../../assests/logo.png";
 import { IoCallOutline } from "react-icons/io5";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { MdOutlineLocalOffer } from "react-icons/md";
+import '../../styles/navbar.css'
 
 const Navbar = () => {
+  const handleChange = (e) => {
+    console.log(e.target.value);
+  }
   return (
     <nav id="navbar sticky">
       <div className="container mx-auto">
@@ -82,10 +86,19 @@ const Navbar = () => {
             <p className="hover:text-blue-700 font-semibold">Home</p>
           </Link>
           <Link to="/">
-            <p className="hover:text-blue-700 font-semibold">Categories</p>
+            {/* <p className=""> */}
+            <div className="hover:text-blue-700 font-semibold">
+              <label htmlFor="brand" className="block text-sm font-medium text-gray-700">Brand</label>
+              <select id="brand" name="brand" className="block w-full py-2 px-3 bg-white text-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <option value="asian_paints">Asian Paints</option>
+                <option value="burger_paints">Burger Paints</option>
+                <option value="nerolac">Nerolac</option>
+              </select>
+            </div>
+            {/* </p> */}
           </Link>
-          <Link to="/">
-            <p className="hover:text-blue-700 font-semibold">Products</p>
+          <Link to="/suggest">
+            <p className="hover:text-blue-700 font-semibold">Suggestions</p>
           </Link>
           <Link to="/">
             <p className="hover:text-blue-700 font-semibold">About Us</p>
