@@ -39,7 +39,7 @@ app.use("/assets", express.static(path.join(__dirname, 'public/assets')));
 /* FILE STORAGE */
 const storage = multer.diskStorage({        // Multer GitHub repo
   destination: function(req, file, cb) {
-    cb(null, "../assets/original_images");
+    cb(null, "public/original_images");
   },
   filename: function(req, file, cb) {
     cb(null, file.originalname);
