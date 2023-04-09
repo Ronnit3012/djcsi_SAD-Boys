@@ -57,11 +57,11 @@ class DeepLabModel(object):
 
         resized_image = image.convert('RGB').resize(
             target_size, Image.ANTIALIAS)
-        
+
         batch_seg_map = self.sess.run(
             self.OUTPUT_TENSOR_NAME,
             feed_dict={self.INPUT_TENSOR_NAME: [np.asarray(resized_image)]})
-        
+
         seg_map = batch_seg_map[0]
 
         return resized_image, seg_map
@@ -127,19 +127,21 @@ def hex_to_rgb(hex):
 
     return rgb
 
+
 def colorImage(file_name, color):
 
     try:
-        filepath = os.path.abspath('./assets/original_images/'+file_name)
+        # filepath = os.path.abspath('../assets/original_images/'+file_name)
+        filepath = os.path.abspath(
+            './server/public/original_images/'+file_name)
 
         print(f'Orignal Image: {filepath}')
 
         orignal_im = Image.open(filepath)
-        
+
         resized_im, seg_map = MODEL.run(orignal_im)
 
         w, h = resized_im.size
-
 
         for i in range(h):
             for j in range(w):
@@ -149,19 +151,21 @@ def colorImage(file_name, color):
                     seg_map[i][j] = 0
 
         mask_j = np.repeat(seg_map[..., None], 3, axis=2)
-        mask_j[np.where((mask_j == [1, 1, 1]).any(axis=2))] = hex_to_rgb(color[1:])   # RGB values for Blue color
+        mask_j[np.where((mask_j == [1, 1, 1]).any(axis=2))] = hex_to_rgb(
+            color[1:])   # RGB values for Blue color
 
         output_image = mask_j+resized_im
 
-        output_filename = color+file_name
+        output_filename = color[1:]+file_name
 
-        output_path = os.path.abspath('./assets/annotated_images/'+output_filename)
+        output_path = os.path.abspath(
+            './server/public/annotated_images/'+output_filename)
 
         plt.axis('off')
-        
+
         plt.imshow(output_image)
 
-        plt.savefig(output_path, bbox_inches='tight', pad_inches = 0)
+        plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
 
         plt.close()
 
