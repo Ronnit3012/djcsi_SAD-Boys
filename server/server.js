@@ -14,6 +14,7 @@ import paintRoutes from './routes/paint.js';
 // import userRoutes from './routes/users.js';
 import { paintWall } from './controllers/paint.js';
 import { verifyToken } from './middlewares/verifyToken.js';
+import Save from "./models/Save.js"
 // import { register } from './controllers/auth.js';
 // import { createPost } from './controllers/posts.js';
 
@@ -54,6 +55,36 @@ app.post('/paint/wall', upload.single('picture'), paintWall);
 app.use('/auth', authRoutes);
 app.use('/paint', paintRoutes);
 // app.use('/users', userRoutes);
+
+// SAVE
+app.post('/save', async (req, res) => {
+  const { userId, paintId, path } = req.body;
+  try {
+    const saved = new Save({
+      userId,
+      paintId,
+      path,
+    })
+
+    const response = await saved.save()
+    return res.status(201).json({ message: "Successfully saved!" });
+  } catch (error) {
+    console.log(error.message)
+    return res.status(500).json({ error: error.message });
+  }
+}); 
+
+app.get('/save/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const data = await Save.find({ userId }).populate("userId").populate("paintId");
+    return res.status(200).json(data);
+  } catch (error) {
+    console.log(error.message)
+    return res.status(500).json ({ error: error.message });
+  }
+});
+
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 3001;

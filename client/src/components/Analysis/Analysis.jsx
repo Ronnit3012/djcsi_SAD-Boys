@@ -1,13 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Footer, Header, Navbar } from "../components";
 import processing from "../../assests/processing.mp4";
+import { useSelector } from "react-redux";
 
 const Analysis = ({ paint }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [location, setLocation] = useState("");
   const [isProcessing, setProcessing] = useState(false);
+  const [paints, setPaints] = useState([]);
+  const user = useSelector((state) => state.auth.user);
+  // const navigate = useNavigate();
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios({
+        method: "get",
+        url: "http://localhost:8000/paint/all",
+      });
+
+      setPaints(response.data);
+    };
+
+    fetchData();
+  }, [setPaints]);
 
   const handleFileInput = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -37,6 +53,22 @@ const Analysis = ({ paint }) => {
 
   const handleChange = () => {
     setLocation("");
+  };
+
+  const handleSave = async () => {
+    const data = {
+      path: location,
+      paintId: paint._id,
+      userId: user._id,
+    };
+
+    try {
+      const response = await axios.post("http://localhost:8000/save", data);
+      console.log(response.data);
+      setLocation("");
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   return (
@@ -103,6 +135,26 @@ const Analysis = ({ paint }) => {
                   </video>
                 </div>
               )}
+              {location && (
+                <div className="flex justify-center gap-6 px-12 py-12">
+                  <button
+                    className="cursor-pointer inline-flex font-bold justify-center items-center py-3 px-5 mr-3 text-base text-center text-slate-50 rounded-lg bg-slate-900 ease-in-out delay-100 hover:bg-black focus:ring-4 focus:ring-black"
+                    // type="submit"
+                    // disabled={!selectedFile}
+                    onClick={handleSave}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="cursor-pointer inline-flex font-bold justify-center items-center py-3 px-5 mr-3 text-base text-center text-slate-50 rounded-lg bg-slate-900 ease-in-out delay-100 hover:bg-black focus:ring-4 focus:ring-black"
+                    // type="submit"
+                    // disabled={!selectedFile}
+                    onClick={handleChange}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
               {!location && (
                 <div className="block text-center px-12 py-12">
                   <button
@@ -115,6 +167,30 @@ const Analysis = ({ paint }) => {
                 </div>
               )}
             </form>
+            <div>
+              {paints.map((pt, index) => {
+                if (pt.hex === paints.hex) {
+                  return (
+                    <>
+                      <ul className="list-disc pl-5 mt-3">
+                        <li className="text-gray-700">{pt.name}</li>
+                        <li className="text-gray-700">{pt.brand}</li>
+                        <li className="text-gray-700">{pt.description}</li>
+                        <li>{pt.price} per swatch (1 sq. ft.)</li>
+                        <li>
+                          <a href={pt.link} target="_blank" rel="noreferrer">
+                            Link to the Website
+                          </a>
+                        </li>
+                      </ul>
+                    </>
+                  );
+                }
+              })}
+            </div>
+            <div>
+              <p></p>
+            </div>
           </div>
         </div>
       </main>
